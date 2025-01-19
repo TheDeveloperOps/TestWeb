@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Prompt Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: url('https://tse4.mm.bing.net/th/id/OIP.b0j7-VkRlgcgtsOy8EdtlwHaGE?rs=1&pid=ImgDetMain') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+        }
+        #response {
+            background-color: #f0f8ff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 300px;
+            height: 150px;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Prompt Demo</h1>
+    <form id="promptForm">
+        <label for="prompt">Enter your prompt:</label><br>
+        <input type="text" id="prompt" name="prompt" placeholder="Type your prompt here..." required style="width: 300px;"><br><br>
+        <button type="submit">Send</button>
+    </form>
+
+    <h2>Response:</h2>
+    <pre id="response">Waiting for your input...</pre>
+
+    <script>
+        const apiKey = "AIzaSyB-rkhKFkNDQvoi8JJLbsKGDh6L78O_aQU"; // Your API key
+        const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+
+        document.getElementById('promptForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent form submission
+
+            const prompt = document.getElementById('prompt').value;
+            const responseElement = document.getElementById('response');
+
+            responseElement.textContent = "Loading...";
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                parts: [
+                                    { text: prompt }
+                                ]
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const answer = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+                responseElement.textContent = answer;
+
+            } catch (error) {
+                responseElement.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
